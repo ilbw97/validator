@@ -1,0 +1,57 @@
+[
+    {
+        "host": "https://test",
+        "required_scheme": true
+    },
+    {
+        "host": "https://.test",
+        "required_scheme": true
+    },
+    {
+        "host": "",
+        "required_scheme": true
+    },
+    {
+        "host": "https://test.",
+        "required_scheme": true
+    },
+    {
+        "host": "ftp://http.com",
+        "required_scheme": true
+    },
+    {
+        "host": "141.254.33.2",
+        "required_scheme": false
+    },
+    {
+        "host": "https://141.254.33.2:443",
+        "required_scheme": true
+    },
+    {
+        "host": "https://www.모니터랩.com",
+        "required_scheme": true
+    },
+    {
+        "host": "https://www.monitorapp.com/test",
+        "required_scheme": true
+    },
+    {
+        "host": "https://www.monitorapp.com/test?test.png",
+        "required_scheme": true
+    },
+    {
+        "host": "https://monitorapp.com/test?test.png",
+        "required_scheme": true
+    },
+    {
+        "host": "https://monitorapp.com",
+        "required_scheme": true
+    },
+    {
+        "host": "https://www.monitorapp.com:443",
+        "required_scheme": true
+    },
+    {
+        "path":"test"
+    }
+]
