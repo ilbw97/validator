@@ -11,6 +11,8 @@ type TestData struct {
 	Host           string `json:"host"`
 	RequiredScheme bool   `json:"required_scheme"`
 	Path           string `json:"path"`
+	Cert           string `json:"cert" xml:"cert" validate:"omitempty,base64" example:"QmFzZTY0IGV4YW1wbGUgY2VydCBkYXRh"` // 빈 값 허용 + Base64 검증
+	Pkey           string `json:"pkey" xml:"pkey" validate:"omitempty,base64" example:"QmFzZTY0IGV4YW1wbGUga2V5IGRhdGE="` // 빈 값 허용 + Base64 검증
 }
 
 var (
@@ -79,6 +81,24 @@ func main() {
 				fmt.Printf("%v is invalid path \n", testData.Host)
 			}
 		}
+
+		if testData.Cert != "" {
+			if isValid := CheckBase64(testData.Cert); isValid {
+				fmt.Printf("%v is valid cert \n", testData.Host)
+			} else {
+				fmt.Printf("%v is invalid cert \n", testData.Host)
+			}
+		}
+
+		if testData.Pkey != "" {
+			if isValid := CheckBase64(testData.Pkey); isValid {
+				fmt.Printf("%v is valid pkey \n", testData.Host)
+			} else {
+				fmt.Printf("%v is invalid pkey \n", testData.Host)
+			}
+		}
+
+		fmt.Printf("UseValidator : %v \n", UseValidator()) //UseValidator()
 		fmt.Println("-------------------------------------------------------------------------")
 	}
 }

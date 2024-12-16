@@ -1,13 +1,61 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
+
+type trafficTypeReqBlock struct {
+	Type  string `json:"type" validate:"oneof=traffic bps visit threat cache"`
+	Stime int64  `json:"stime" validate:"required,min=1"`
+	Etime int64  `json:"etime" validate:"required,gtfield=stime"`
+}
+
+// func UseValidator(req interface{}) bool {
+func UseValidator() bool {
+	jsonData := []byte(`{
+        "stime": 1721192000,
+        "etime": 1733420270,
+        "type": "traffic"
+    }`)
+
+	var req trafficTypeReqBlock
+	err := json.Unmarshal(jsonData, &req)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return false
+	}
+
+	fmt.Printf("Parsed Struct: %+v\n", req)
+
+	v := validator.New()
+	err = v.Struct(req)
+	if err != nil {
+		fmt.Println("Validation Error:", err)
+		return false
+	}
+
+	return true
+}
+
+func CheckBase64(input string) bool {
+	_, err := base64.StdEncoding.DecodeString(input)
+	if err != nil {
+		fmt.Println("Invalid Base64:", err)
+		return false
+	}
+	// // Check if the input string matches the base64 pattern
+	// return regexp.MustCompile(`^[a-zA-Z0-9+/]*={0,2}$`).MatchString(input)
+	return true
+}
 
 func IsSubdomain(input string) (bool, error) {
 	// Parse the input as a URL
