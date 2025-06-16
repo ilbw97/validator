@@ -57,7 +57,24 @@ func CheckBase64(input string) bool {
 	return true
 }
 
-func IsSubdomain(input string) (bool, error) {
+// without scheme
+func IsSubdomainWithoutScheme(input string) (bool, error) {
+	// Split the input into parts by "."
+	parts := strings.Split(input, ".")
+	fmt.Printf("parts : %v,len : %v\n", parts, len(parts))
+
+	// A root domain typically has two parts (e.g., example.com)
+	// A subdomain has more than two parts (e.g., sub.example.com)
+	return len(parts) > 2, nil
+}
+
+// with scheme
+func IsSubdomainWithScheme(input string) (bool, error) {
+	// Ensure input is a valid URL by adding a scheme if missing
+	if !strings.HasPrefix(input, "http://") && !strings.HasPrefix(input, "https://") {
+		input = "http://" + input
+	}
+
 	// Parse the input as a URL
 	parsedURL, err := url.Parse(input)
 	if err != nil {
@@ -67,6 +84,9 @@ func IsSubdomain(input string) (bool, error) {
 	// Extract the host from the parsed URL
 	host := parsedURL.Host
 
+	// Handle cases where port is included (e.g., "example.com:8080")
+	host = strings.Split(host, ":")[0]
+
 	// Split the host into parts
 	parts := strings.Split(host, ".")
 
@@ -74,6 +94,26 @@ func IsSubdomain(input string) (bool, error) {
 	// A subdomain has more than two parts (e.g., sub.example.com)
 	return len(parts) > 2, nil
 }
+
+
+// func IsSubdomain(input string) (bool, error) {
+// 	// Parse the input as a URL
+// 	parsedURL, err := url.Parse(input)
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	parsedURL.String()
+// 	// Extract the host from the parsed URL
+// 	host := parsedURL.Host
+
+// 	// Split the host into parts
+// 	parts := strings.Split(host, ".")
+
+// 	// A root domain typically has two parts (e.g., example.com)
+// 	// A subdomain has more than two parts (e.g., sub.example.com)
+// 	return len(parts) > 2, nil
+// }
 
 func URIValidator(s string, requiredScheme bool) bool {
 	if s == "" {
@@ -170,10 +210,32 @@ func PathValidator(s string) bool {
 	return err == nil && u.Path != "" && u.Scheme == "" && u.Host == "" && u.RawQuery == ""
 }
 
-func DomainValidator(domain string) bool {
+// func DomainValidator(domain string) bool {
 
+// 	// The domain length should be greater than 1 and less than 253 characters
+// 	if len(domain) == 0 || len(domain) > 253 {
+// 		return false
+// 	}
+
+// 	// Combined regex pattern to check domain validity
+// 	domainPattern := regexp.MustCompile(`^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$`)
+// 	schemePattern := regexp.MustCompile(`^https?://`)
+// 	if !domainPattern.MatchString(domain) || !schemePattern.MatchString(domain) {
+// 		fmt.Printf("Invalid domain format: %s\n", domain)
+// 		return false
+// 	} else {
+// 		fmt.Println("Valid domain format")
+// 	}
+
+// 	return true
+// }
+
+func DomainValidator(domain string, isSubDomain bool) bool {
+
+	fmt.Printf("domain : %s, isSubDomain : %v\n", domain, isSubDomain)
 	// The domain length should be greater than 1 and less than 253 characters
 	if len(domain) == 0 || len(domain) > 253 {
+		fmt.Printf("Invalid domain length: %d\n", len(domain))
 		return false
 	}
 
@@ -182,9 +244,33 @@ func DomainValidator(domain string) bool {
 	if !domainPattern.MatchString(domain) {
 		fmt.Printf("Invalid domain format: %s\n", domain)
 		return false
-	} else {
-		fmt.Println("Valid domain format")
 	}
 
-	return true
+	var domainData string
+	if strings.HasPrefix(domain, "http://") || strings.HasPrefix(domain, "https://") {
+		parsedUrl, err := url.Parse(domain)
+		if err != nil{
+			fmt.Printf("Error parsing URL: %v\n", err)
+			return false
+		}
+		domainData = parsedUrl.Host
+	} else {
+		domainData = domain
+	}
+
+	fmt.Printf("\n\ndomainData : %s\n", domainData)
+
+	isSub, err := IsSubdomainWithScheme(domainData)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	if !isSub {
+		fmt.Printf("%s is not sub domain\n", domain)
+		return false
+	}else{
+		fmt.Printf("%s is sub domain\n", domain)
+		return true
+	}
+
 }
