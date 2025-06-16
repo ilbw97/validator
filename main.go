@@ -52,7 +52,7 @@ func main() {
 	for _, testData := range testDatas {
 		fmt.Println("-------------------------------------------------------------------------")
 		if testData.Host != "" {
-			if domainRes := DomainValidator(testData.Host); domainRes {
+			if domainRes := DomainValidator(testData.Host, testData.RequiredScheme); domainRes {
 				fmt.Printf("DomainValidator said %s is valid domain \n\n", testData.Host)
 			} else {
 				fmt.Printf("DomainValidator said %s is invalid domain \n\n", testData.Host)
@@ -61,7 +61,7 @@ func main() {
 			res := URIValidator(testData.Host, testData.RequiredScheme)
 			if res {
 				fmt.Printf("%v is valid url \n", testData.Host)
-				isSub, err := IsSubdomain(testData.Host)
+				isSub, err := IsSubdomainWithScheme(testData.Host)
 				if err != nil {
 					fmt.Println(err)
 				}
